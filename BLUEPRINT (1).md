@@ -45,6 +45,25 @@ These apply to every file from the first commit.
 - Trunk-based flow with short-lived feature branches and PRs, even when working solo (PR description doubles as documentation).
 - Tests accompany every feature. Coverage target: 80% on the application layer.
 
+### 1.6 Learning protocol (the developer must understand every line)
+
+This project exists to be explained in a job interview, so **no step is complete until the developer can explain it.** Claude acts as tutor and mock interviewer, in the chat, for every file and feature.
+
+**For every file or feature built, in this order:**
+1. **Preview:** before writing code, Claude states what will be built, why it exists, and where it sits in the request flow (§3).
+2. **Build small:** one file or one tightly related group at a time, never a batch of unrelated files.
+3. **Walkthrough:** after writing, Claude explains the file line by line in plain language, covering the Laravel concept used and the design reason (which SOLID principle, which blueprint rule).
+4. **Developer review:** the developer reads the code and says what they do not understand. Claude re-explains until it is clear. Claude does not move on while questions are open.
+5. **Recruiter round:** Claude plays a recruiter and asks 2 to 4 interview-style questions about that file (what it does, why it was designed this way, what breaks if changed, how to test it). The developer answers in their own words; Claude gives feedback and corrects gaps.
+6. **Gate:** the developer explicitly says "next" before Claude starts the following step. Nothing is committed until this gate passes.
+
+**Rules:**
+- Claude never silently adds code the developer has not been walked through.
+- If the developer cannot answer a recruiter question, that file is revisited before continuing.
+- Each roadmap step (§11) ends with a short recap quiz covering the whole step.
+- The developer may ask "why" at any time; explaining takes priority over speed.
+- `Laravel-Crash-Course.md` (desktop) is the reference for concepts; Claude links back to its sections when relevant.
+
 ---
 
 ## 2. Features
