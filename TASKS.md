@@ -15,7 +15,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 
 | Step | Name | Status |
 |---|---|---|
-| 0 | Repo setup | 5 / 10 |
+| 0 | Repo setup | 6 / 10 |
 | 1 | Backend skeleton | 0 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
@@ -41,7 +41,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
   - [x] Scans `app/`, `src/`, `routes/`, `tests/`; exemptions listed explicitly
   - [x] Fails with a clear message naming the file
 - [~] 0.6 `.github/workflows/ci.yml` skeleton — developer approved and local commands passed; GitHub run pending after upload
-- [ ] 0.7 gitleaks pre-commit hook
+- [x] 0.7 gitleaks pre-commit hook — installed and activated locally; unit and real clean/fake-secret commit checks passed; developer said "next"
 - [ ] 0.8 GitHub settings: secret scanning + push protection on (manual), `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml`
   - [ ] Enable private vulnerability reporting for the SECURITY.md reporting channel
 - [ ] 0.9 Branch protection on `main` (PR + CI required, no force-push), issue templates, `docs/adr/` folder with ADR template

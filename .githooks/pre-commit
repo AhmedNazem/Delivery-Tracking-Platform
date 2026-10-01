@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v gitleaks >/dev/null 2>&1; then
+    scanner=gitleaks
+else
+    root=$(git rev-parse --show-toplevel)
+    scanner="$root/.tools/gitleaks/gitleaks.exe"
+    if [[ ! -x "$scanner" ]]; then
+        echo 'Commit blocked: install Gitleaks and make it available on PATH.' >&2
+        echo 'See docs/SETUP.md for setup instructions.' >&2
+        exit 1
+    fi
+fi
+
+# Scan the staged snapshot, and conceal matched secret values in diagnostics.
+exec "$scanner" git --pre-commit --staged --redact --no-banner

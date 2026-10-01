@@ -38,6 +38,7 @@ test-results/
 docker/mysql-data/
 
 # Editor and OS files
+.tools/
 .idea/
 .vscode/
 .DS_Store
