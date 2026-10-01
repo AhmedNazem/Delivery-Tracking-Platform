@@ -57,7 +57,7 @@ This project exists to be explained in a job interview, so **no step is complete
 3. **Walkthrough:** after writing, Claude explains the file line by line in plain language, covering the Laravel concept used and the design reason (which SOLID principle, which blueprint rule).
 4. **Developer review:** the developer reads the code and says what they do not understand. Claude re-explains until it is clear. Claude does not move on while questions are open.
 5. **Recruiter round:** Claude plays a recruiter and asks 2 to 4 interview-style questions about that file (what it does, why it was designed this way, what breaks if changed, how to test it). The developer answers in their own words; Claude gives feedback and corrects gaps.
-6. **Gate:** the developer explicitly says "next" before Claude starts the following step. Nothing is committed until this gate passes.
+6. **Gate:** offer review after completing the small task. The developer may explicitly say "next" or ask to move on even with unanswered practice questions; respect that instruction, record remaining practice honestly, and proceed or commit. Never repeatedly block an explicit request to continue with more quiz questions.
 
 **Rules:**
 - Claude never silently adds code the developer has not been walked through.
@@ -71,6 +71,8 @@ This project exists to be explained in a job interview, so **no step is complete
 
 The goal is independent reasoning: the developer must be able to read unfamiliar code, trace behavior, identify edge cases, and justify a fix without relying on the assistant to supply the answer.
 
+- **Explanation style:** use the simplest possible language and concrete real-world examples. Introduce unfamiliar syntax before relying on it, and explain one small piece at a time.
+
 - **File inventory:** report the exact number of new and modified files separately, with clickable paths, a one-sentence purpose for each, and a suggested reading order. Count tests and learning documents too; distinguish executable code from documentation and configuration.
 - **Learning artifact:** maintain `docs/learning/<task-id>-<topic>.md` for each coding task. Include the inventory, actual implementation excerpts, line-by-line explanation, flow between files, validation results, and known limitations. Keep code examples small and tied to the current task.
 - **Design reasoning:** explain why this implementation was chosen, the alternatives and tradeoffs, and the relevant Laravel concept and blueprint rule. Apply SOLID only where it genuinely applies.
@@ -79,7 +81,7 @@ The goal is independent reasoning: the developer must be able to read unfamiliar
 - **Interview practice:** the 2–4 recruiter questions must include reasoning about the actual code or configuration, a failure case, and how to verify behavior. Recall of terminology alone does not pass the review.
 - **Small hands-on exercise:** ask the developer to make or propose one focused change and explain the expected result. Do not silently do their exercise for them.
 - **Setup tasks:** provide a short purpose summary, file inventory, and relevant checks only, as specified in §1.6. Do not create learning guides or interview exercises for these tasks. Automation scripts are code and retain the full learning cycle.
-- **Gate remains mandatory:** walkthrough, independent review, exercise, and recruiter feedback must finish before the developer's explicit "next" permits committing or starting the following task. Do not retroactively reopen tasks already passed before this rule was introduced.
+- **Review after implementation:** finish implementation and validation, then provide a simple review with good practices. Keep unanswered exercises available for later. An explicit developer instruction to continue overrides the practice gate; record the override without claiming the questions were answered or mastery was demonstrated. Do not retroactively reopen tasks already accepted.
 
 ---
 

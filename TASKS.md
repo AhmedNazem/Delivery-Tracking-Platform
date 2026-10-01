@@ -15,7 +15,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 
 | Step | Name | Status |
 |---|---|---|
-| 0 | Repo setup | 4 / 10 |
+| 0 | Repo setup | 5 / 10 |
 | 1 | Backend skeleton | 0 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
@@ -36,10 +36,10 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [x] 0.2 `.gitignore` — verification, learning review, recruiter round, and "next" gate passed
 - [x] 0.3 `LICENSE` (MIT) — validated; developer accepted setup exception and "next" gate
 - [x] 0.4 `SECURITY.md` — local checks passed; developer said "next"
-- [ ] 0.5 `scripts/check-file-length.sh`
-  - [ ] Counts code lines, ignores blank lines and comments
-  - [ ] Scans `app/`, `src/`, `routes/`, `tests/`; exemptions listed explicitly
-  - [ ] Fails with a clear message naming the file
+- [x] 0.5 `scripts/check-file-length.sh` — tests passed; partial review completed; developer explicitly requested continuing with remaining practice deferred
+  - [x] Counts code lines, ignores blank lines and supported comment forms (lexer limitations documented)
+  - [x] Scans `app/`, `src/`, `routes/`, `tests/`; exemptions listed explicitly
+  - [x] Fails with a clear message naming the file
 - [ ] 0.6 `.github/workflows/ci.yml` skeleton (runs the length check)
 - [ ] 0.7 gitleaks pre-commit hook
 - [ ] 0.8 GitHub settings: secret scanning + push protection on (manual), `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml`
