@@ -2,7 +2,7 @@
 
 A logistics and delivery management platform: dispatchers create and assign shipments, drivers update delivery status from the field, customers track parcels by tracking number.
 
-**Stack:** Laravel 11 (PHP 8.3) · MySQL 8 · React 18 + Vite + TypeScript · Laravel Sanctum · Docker Compose · GitHub Actions
+**Stack:** Laravel 11 (PHP 8.3) · MySQL 8 · Next.js (App Router) + React + TypeScript · Laravel Sanctum · Docker Compose · GitHub Actions
 
 **Repository:** public. Everything in this document assumes that anyone can read the code and the git history.
 
@@ -62,6 +62,7 @@ This project exists to be explained in a job interview, so **no step is complete
 - If the developer cannot answer a recruiter question, that file is revisited before continuing.
 - Each roadmap step (§11) ends with a short recap quiz covering the whole step.
 - The developer may ask "why" at any time; explaining takes priority over speed.
+- Database work is explained too: for every migration and query, Claude shows the SQL it produces, why each index exists, and how to check it with `EXPLAIN`.
 - `Laravel-Crash-Course.md` (desktop) is the reference for concepts; Claude links back to its sections when relevant.
 
 ---
@@ -212,7 +213,7 @@ backend/
 Feature-based structure; each feature owns its components, hooks, and API calls.
 ```
 frontend/src/
-├── app/                 # providers, router, app shell
+├── app/                 # Next.js App Router: routes, layouts, providers
 ├── features/
 │   ├── auth/            # LoginForm, useAuth, authApi
 │   ├── shipments/       # ShipmentTable, ShipmentForm, useShipments, shipmentsApi
@@ -220,10 +221,9 @@ frontend/src/
 │   ├── dashboard/
 │   └── tracking/        # public tracking page
 ├── components/ui/       # Button, Input, Modal, Table, StatusBadge
-├── lib/                 # axios client, formatters
+├── lib/                 # API client, formatters
 ├── hooks/               # shared hooks
-├── types/               # shared TypeScript types
-└── main.tsx
+└── types/               # shared TypeScript types
 ```
 
 ### 4.3 Repository root
@@ -379,9 +379,9 @@ At least one feature test per row of the access-control matrix: each role attemp
 ---
 
 ## 10. CI/CD & DevOps
-- `docker-compose.yml`: `app` (PHP-FPM), `nginx`, `mysql`, `frontend` (Vite dev). One command to run locally: `docker compose up`.
+- `docker-compose.yml`: `app` (PHP-FPM), `nginx`, `mysql`, `frontend` (Next.js dev). One command to run locally: `docker compose up`.
 - GitHub Actions `ci.yml`: install → lint → static analysis → tests (with MySQL service) → file-length check → frontend build.
-- Optional deployment later: backend on Render/Railway/DigitalOcean, frontend on Vercel; secrets only via the platform's environment settings.
+- Continuous delivery pipeline and environments: see §14. Hosting candidates: backend on Render/Railway/DigitalOcean, frontend on Vercel; secrets only via the platform's environment settings.
 
 ---
 
@@ -397,10 +397,11 @@ At least one feature test per row of the access-control matrix: each role attemp
 | 5 | State machine & events | Transitions, event log, 409 on invalid transitions, tests |
 | 6 | Drivers & assignment | Assign/reassign, driver-scoped endpoint, access tests |
 | 7 | Public tracking | Safe resource, rate limiting, tests |
-| 8 | Frontend foundation | Vite + TS, auth flow, route guards, API client |
+| 8 | Frontend foundation | Next.js + TS, auth flow (Sanctum cookies), route guards, API client |
 | 9 | Frontend features | Shipment table/form, driver view, dashboard, tracking page |
 | 10 | Hardening | Security headers, CORS, audit pass, README with screenshots, API docs |
 | 11 | Phase 2 items | As time allows |
+| 12 | Production deployment | `DEPLOYMENT.md` written and followed: hosting and environments, production `.env` and secrets, HTTPS, app/API on one parent domain for Sanctum cookies, safe migrations, queue worker and scheduler, backups, logging/monitoring, rollback |
 
 Realistic timeline: steps 0–7 (working API) in about one week; 8–10 (dashboard and polish) in the second week.
 
@@ -426,3 +427,48 @@ Be ready to explain, in your own words and with the code open:
 - The Eloquent relationships (`Shipment belongsTo User` as driver, `hasMany ShipmentEvent`) and the indexes you chose and why.
 - How you would handle concurrency (two dispatchers assigning the same shipment): row locking or optimistic version check.
 - What you would change to scale (queues for notifications, caching dashboard stats, read replicas).
+
+---
+
+## 14. Software Development Lifecycle
+
+Every feature goes through the same loop. Nothing skips a stage.
+
+| Stage | What happens here | Artifact |
+|---|---|---|
+| 1. Plan | Feature becomes a GitHub Issue with acceptance criteria; it maps to a task in `TASKS.md` | Issue + task |
+| 2. Design | Non-obvious decisions get a short ADR (why this, not that) | `docs/adr/NNNN-title.md` |
+| 3. Test first | Write a failing test for the behavior (red) | Test file |
+| 4. Implement | Smallest code to pass (green), then clean up (refactor commit) | Code |
+| 5. Local gate | Pint, PHPStan, ESLint, type-check, tests, 150-line check all pass locally | Clean run |
+| 6. Pull request | Short-lived branch, Conventional Commit title, PR template filled in | PR |
+| 7. CI | All checks must pass; branch protection blocks merge otherwise | Green build |
+| 8. Review | Self-review of the diff, plus AI code review; findings resolved | Approved PR |
+| 9. Merge | Squash-merge to `main`; `main` is always deployable | Commit on main |
+| 10. Release | Tag semver (`v0.1.0`), generate changelog | Git tag + `CHANGELOG.md` |
+| 11. Deploy | CD pipeline deploys to staging automatically, to production on manual approval | Live version |
+| 12. Operate | Monitoring, logs, backups, dependency updates (Dependabot) | Dashboards, alerts |
+| 13. Learn | Bugs get a regression test first, then a fix | Test + fix |
+
+### 14.1 Test pyramid
+- **Unit (many, fast, no database):** state machine, tracking number generator, DTOs, enums, Actions with a fake repository.
+- **Feature (some):** every endpoint through HTTP with `RefreshDatabase`, plus the 403 access matrix.
+- **End to end (few):** Playwright smoke test of the main flow, run against staging.
+- **Rules:** tests are written before the code they cover; a bug fix starts with a test that reproduces it; CI fails below 80% coverage on the application layer.
+
+### 14.2 CI (every push and PR)
+Parallel jobs: backend (Pint, PHPStan, tests with MySQL service, coverage gate), frontend (ESLint, type-check, Vitest, build), security (`composer audit`, `npm audit`, gitleaks), and the 150-line check.
+
+### 14.3 CD (on merge to `main`)
+1. Build Docker images, tag with the commit SHA.
+2. Deploy to **staging**, run migrations, run smoke tests.
+3. Manual approval gate, then deploy to **production** (GitHub Environments with required reviewer).
+4. Rollback = redeploy the previous image tag; migrations are written to be backward compatible for one release.
+
+### 14.4 Branching and repo controls
+- Branch protection on `main`: PR required, CI required, no force-push, linear history.
+- Branch names: `feat/...`, `fix/...`, `refactor/...`.
+- Environments: `local` (Docker), `staging`, `production`; each with its own secrets.
+
+### 14.5 Definition of done (every task)
+Tests written first and passing · all CI checks green · no file over 150 lines · walkthrough and recruiter round passed · docs updated (README, ADR, API docs if affected) · `TASKS.md` ticked.
