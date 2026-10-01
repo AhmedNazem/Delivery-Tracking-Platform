@@ -7,13 +7,14 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 
 **Per-file cycle** (applies to every file task below): preview → build → walkthrough → developer review → recruiter round → "next" → commit.
 **Per-step close:** recap quiz covering the whole step.
+**Active review:** every task follows `BLUEPRINT.md` §1.7: file inventory, flow, design tradeoffs, good/bad examples, an unanswered review exercise, and hands-on practice.
 **Definition of done** (blueprint §14.5): tests first and green · CI green · no file over 150 lines · walkthrough and recruiter round passed · docs updated · this file ticked.
 
 ## Progress
 
 | Step | Name | Status |
 |---|---|---|
-| 0 | Repo setup | 1 / 10 |
+| 0 | Repo setup | 2 / 10 |
 | 1 | Backend skeleton | 0 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
@@ -31,7 +32,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 
 ## Step 0: Repo setup
 - [x] 0.1 Rename blueprint to `BLUEPRINT.md`, add this tracker, commit
-- [ ] 0.2 `.gitignore`
+- [x] 0.2 `.gitignore` — verification, learning review, recruiter round, and "next" gate passed
 - [ ] 0.3 `LICENSE` (MIT)
 - [ ] 0.4 `SECURITY.md`
 - [ ] 0.5 `scripts/check-file-length.sh`

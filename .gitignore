@@ -1,0 +1,44 @@
+# Secrets: never commit real environment files (repo is public)
+.env
+.env.*
+!.env.example
+
+# PHP / Laravel dependencies and runtime files
+vendor/
+backend/storage/*.key
+backend/storage/logs/*
+!backend/storage/logs/.gitignore
+backend/storage/framework/cache/*
+!backend/storage/framework/cache/.gitignore
+backend/storage/framework/sessions/*
+!backend/storage/framework/sessions/.gitignore
+backend/storage/framework/views/*
+!backend/storage/framework/views/.gitignore
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitignore
+.phpunit.result.cache
+.phpunit.cache/
+backend/public/storage
+backend/public/hot
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+npm-debug.log*
+
+# Test and coverage output
+coverage/
+backend/build/
+playwright-report/
+test-results/
+
+# Docker local data
+docker/mysql-data/
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

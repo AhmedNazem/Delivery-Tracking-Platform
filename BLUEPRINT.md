@@ -65,6 +65,20 @@ This project exists to be explained in a job interview, so **no step is complete
 - Database work is explained too: for every migration and query, Claude shows the SQL it produces, why each index exists, and how to check it with `EXPLAIN`.
 - `Laravel-Crash-Course.md` (desktop) is the reference for concepts; Claude links back to its sections when relevant.
 
+### 1.7 Active code review practice (required for every task)
+
+The goal is independent reasoning: the developer must be able to read unfamiliar code, trace behavior, identify edge cases, and justify a fix without relying on the assistant to supply the answer.
+
+- **File inventory:** report the exact number of new and modified files separately, with clickable paths, a one-sentence purpose for each, and a suggested reading order. Count tests and learning documents too; distinguish executable code from documentation and configuration.
+- **Learning artifact:** maintain `docs/learning/<task-id>-<topic>.md` for each task. Include the inventory, actual implementation excerpts, line-by-line explanation, flow between files, validation results, and known limitations. Keep code examples small and tied to the current task.
+- **Design reasoning:** explain why this implementation was chosen, the alternatives and tradeoffs, and the relevant Laravel concept and blueprint rule. Apply SOLID only where it genuinely applies.
+- **Good and bad examples:** show a working approach beside a flawed alternative. Explain the concrete failure, its trigger, and the smallest correction. Label intentionally flawed examples as teaching-only; never add them to application code. For legal documents, preserve standard wording and use configuration or workflow examples instead of rewriting legal terms.
+- **Independent review first:** include a separate, unannotated teaching snippet or diff with a deliberate defect. Ask the developer to predict behavior, trace inputs and outputs, identify edge cases, and suggest a fix or test before revealing the solution. Keep its answer out of the initial artifact; provide hints and feedback after the developer attempts it.
+- **Interview practice:** the 2–4 recruiter questions must include reasoning about the actual code or configuration, a failure case, and how to verify behavior. Recall of terminology alone does not pass the review.
+- **Small hands-on exercise:** ask the developer to make or propose one focused change and explain the expected result. Do not silently do their exercise for them.
+- **Setup tasks:** use actual configuration snippets or workflow examples when there is no executable code. State clearly when a task has no HTTP request flow; do not invent application files to make it appear more complex.
+- **Gate remains mandatory:** walkthrough, independent review, exercise, and recruiter feedback must finish before the developer's explicit "next" permits committing or starting the following task. Do not retroactively reopen tasks already passed before this rule was introduced.
+
 ---
 
 ## 2. Features
