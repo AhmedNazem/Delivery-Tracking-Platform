@@ -15,7 +15,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 
 | Step | Name | Status |
 |---|---|---|
-| 0 | Repo setup | 3 / 10 |
+| 0 | Repo setup | 4 / 10 |
 | 1 | Backend skeleton | 0 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
@@ -35,7 +35,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [x] 0.1 Rename blueprint to `BLUEPRINT.md`, add this tracker, commit
 - [x] 0.2 `.gitignore` — verification, learning review, recruiter round, and "next" gate passed
 - [x] 0.3 `LICENSE` (MIT) — validated; developer accepted setup exception and "next" gate
-- [ ] 0.4 `SECURITY.md`
+- [x] 0.4 `SECURITY.md` — local checks passed; developer said "next"
 - [ ] 0.5 `scripts/check-file-length.sh`
   - [ ] Counts code lines, ignores blank lines and comments
   - [ ] Scans `app/`, `src/`, `routes/`, `tests/`; exemptions listed explicitly
@@ -43,6 +43,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] 0.6 `.github/workflows/ci.yml` skeleton (runs the length check)
 - [ ] 0.7 gitleaks pre-commit hook
 - [ ] 0.8 GitHub settings: secret scanning + push protection on (manual), `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml`
+  - [ ] Enable private vulnerability reporting for the SECURITY.md reporting channel
 - [ ] 0.9 Branch protection on `main` (PR + CI required, no force-push), issue templates, `docs/adr/` folder with ADR template
 - [ ] 0.10 `CHANGELOG.md` + semver tagging convention
 - [ ] Recap quiz
