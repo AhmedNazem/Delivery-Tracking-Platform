@@ -38,3 +38,20 @@ bash tests/scripts/pre-commit-test.sh
 These tests simulate scanner responses. Also verify the real scanner against a
 temporary repository with a clean staged file and a fake secret; do not use real
 credentials. Never infer complete security coverage from a successful scan.
+
+## GitHub repository security and dependency updates
+
+On 2026-10-02, the GitHub API confirmed this repository is public and has secret
+scanning and push protection enabled. Private vulnerability reporting was enabled
+and verified, so the private reporting channel described in SECURITY.md is active.
+
+The tracked PR template prompts reviewers for the problem, validation, and risks.
+Dependabot currently checks GitHub Actions weekly and limits open update PRs to
+five. It becomes active after `.github/dependabot.yml` reaches the default branch.
+Add Composer for `/backend` and npm for `/frontend` when their package manifests
+exist; do not configure update jobs for nonexistent manifests.
+
+Repository settings are separate from local files: cloning the project does not
+copy GitHub settings, and local commits do not publish templates or activate
+Dependabot until pushed. Dependabot opens proposals; maintainers review and merge
+them, rather than automatically accepting updates.
