@@ -2,7 +2,7 @@
 
 A logistics and delivery management platform: dispatchers create and assign shipments, drivers update delivery status from the field, customers track parcels by tracking number.
 
-**Stack:** Laravel 11 (PHP 8.3) · MySQL 8 · Next.js (App Router) + React + TypeScript · Laravel Sanctum · Docker Compose · GitHub Actions
+**Stack:** Laravel 11 (PHP 8.3) · MySQL 8 · Next.js (App Router) + React + TypeScript · i18next + react-i18next · Laravel Sanctum · Docker Compose · GitHub Actions
 
 **Repository:** public. Everything in this document assumes that anyone can read the code and the git history.
 
@@ -117,16 +117,38 @@ The goal is independent reasoning: the developer must be able to read unfamiliar
 **Dashboard**
 - Counts by status, deliveries per day (last 30 days), driver performance (delivered / failed ratio).
 
+**Bilingual interface and SEO**
+- Arabic and English are MVP requirements, built during frontend foundation and feature work (§2.4), rather than postponed to Phase 2.
+
 ### 2.2 Phase 2 (after MVP is solid)
 - Proof of delivery (photo upload + recipient signature name).
 - Email/SMS notification on status change via a pluggable `NotificationChannel`.
 - Bulk import of shipments from CSV.
 - Export reports to CSV.
 - Audit log viewer for admins.
-- Arabic / English UI with RTL support.
 
 ### 2.3 Explicitly out of scope
 Real-time GPS, payments, route optimization, mobile apps. Mention them in the README as future work only.
+
+### 2.4 Arabic / English and SEO (frontend roadmap)
+
+**Translation choice:** use `i18next` with `react-i18next` for the Next.js interface. Do not substitute `next-intl` without the developer requesting a change. Implement this when frontend work begins; recording this requirement does not authorize skipping prerequisite roadmap tasks.
+
+- Support `ar` and `en` through explicit locale routes such as `/ar` and `/en`. Validate locale values and define a documented default/fallback during task 8.6.
+- Keep translated UI text in matching locale dictionaries, organized by feature or namespace. Avoid hardcoded visible text and language conditionals scattered through components.
+- Load the chosen language on the server so the initial HTML already contains translated content. Keep server i18next instances isolated per request to prevent concurrent users receiving each other's language; hydrate client components consistently.
+- Set HTML `lang` and `dir` from the locale: Arabic uses `rtl`, English uses `ltr`. Use CSS logical properties and verify forms, tables, icons, and mixed-language tracking numbers in both directions.
+- Provide a language switcher that preserves the equivalent page when available, and use locale-aware formatting for dates, numbers, and money.
+- Begin with one small translated page and switcher during task 8.6, with the usual code walkthrough and review, before applying the pattern to all features in task 9.6.
+- This frontend requirement does not silently add backend localization packages. Decide Laravel validation/API message localization separately when those features are built.
+
+**SEO from the frontend foundation:**
+- Use Next.js metadata with translated titles and descriptions; eligible public pages have locale-specific canonical URLs and reciprocal `hreflang` alternates (`ar`/`en`). Generate absolute URLs from the configured public site origin, not a hardcoded production hostname.
+- Add localized Open Graph metadata and suitable share metadata for eligible public pages. Use semantic HTML, meaningful headings, and translated image alternatives where applicable.
+- Maintain `sitemap.xml` and `robots.txt` when public routes exist. Include only canonical, indexable public URLs in the sitemap; exclude login, authenticated dashboard, and shipment tracking pages/results.
+- Preserve `noindex` for public shipment tracking pages, including localized metadata. Mark login and authenticated dashboard pages `noindex` too. These directives are not access control; policies and authentication still protect private data.
+- Do not rely on robots.txt blocking to make crawlers read a page's `noindex`. Keep personal shipment data out of public metadata, share previews, and structured data.
+- Test server-rendered translations, language switching, RTL/LTR, dictionary consistency, fallback/unsupported locales, metadata and alternate URLs, and the noindex/sitemap exclusions. Verify representative page HTML and complete an SEO audit during hardening.
 
 ---
 
@@ -231,6 +253,7 @@ backend/
 Feature-based structure; each feature owns its components, hooks, and API calls.
 ```
 frontend/src/
+├── i18n/                # i18next server/client setup, locale validation, dictionaries
 ├── app/                 # Next.js App Router: routes, layouts, providers
 ├── features/
 │   ├── auth/            # LoginForm, useAuth, authApi
@@ -415,9 +438,9 @@ At least one feature test per row of the access-control matrix: each role attemp
 | 5 | State machine & events | Transitions, event log, 409 on invalid transitions, tests |
 | 6 | Drivers & assignment | Assign/reassign, driver-scoped endpoint, access tests |
 | 7 | Public tracking | Safe resource, rate limiting, tests |
-| 8 | Frontend foundation | Next.js + TS, auth flow (Sanctum cookies), route guards, API client |
-| 9 | Frontend features | Shipment table/form, driver view, dashboard, tracking page |
-| 10 | Hardening | Security headers, CORS, audit pass, README with screenshots, API docs |
+| 8 | Frontend foundation | Next.js + TS, auth flow (Sanctum cookies), route guards, API client, i18next + locale routing, SEO foundation |
+| 9 | Frontend features | Shipment table/form, driver view, dashboard, tracking page, Arabic/English across features |
+| 10 | Hardening | Security headers, CORS, audit pass, README with screenshots, API docs, bilingual and SEO audit |
 | 11 | Phase 2 items | As time allows |
 | 12 | Production deployment | `DEPLOYMENT.md` written and followed: hosting and environments, production `.env` and secrets, HTTPS, app/API on one parent domain for Sanctum cookies, safe migrations, queue worker and scheduler, backups, logging/monitoring, rollback |
 

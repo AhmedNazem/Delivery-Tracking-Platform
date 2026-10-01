@@ -23,10 +23,10 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 | 5 | State machine & events | 0 / 5 |
 | 6 | Drivers & assignment | 0 / 5 |
 | 7 | Public tracking | 0 / 4 |
-| 8 | Frontend foundation | 0 / 5 |
-| 9 | Frontend features | 0 / 5 |
-| 10 | Hardening | 0 / 5 |
-| 11 | Phase 2 | 0 / 6 |
+| 8 | Frontend foundation | 0 / 7 |
+| 9 | Frontend features | 0 / 6 |
+| 10 | Hardening | 0 / 6 |
+| 11 | Phase 2 | 0 / 5 |
 | 12 | Production deployment | 0 / 9 |
 
 ---
@@ -47,7 +47,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
   - [x] Enable private vulnerability reporting for the SECURITY.md reporting channel (enabled and verified through GitHub API)
   - [x] Commit PR template and Dependabot config after developer review
   - [ ] Verify template availability and Dependabot activation after upload
-- [ ] 0.9 Branch protection on `main` (PR + CI required, no force-push), issue templates, `docs/adr/` folder with ADR template
+- [~] 0.9 Branch protection, issue templates, and ADR template — protection verified; developer said "next"; template activation after upload pending
 - [ ] 0.10 `CHANGELOG.md` + semver tagging convention
 - [ ] Recap quiz
 
@@ -116,6 +116,17 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] 8.3 Auth feature: `LoginForm`, `useAuth`, `authApi`
 - [ ] 8.4 Route guards by role
 - [ ] 8.5 Vitest + Testing Library setup, CI frontend build/lint/type-check
+- [ ] 8.6 i18next + react-i18next Arabic/English foundation (BLUEPRINT.md §2.4)
+  - [ ] Locale dictionaries, server-rendered translations, request-isolated instances, consistent client hydration
+  - [ ] `/ar` and `/en` routes; locale validation; document default and fallback
+  - [ ] Small translated page and language switcher preserving the equivalent route
+  - [ ] HTML lang + RTL/LTR; locale-aware date/number/currency formatting
+  - [ ] Tests for switching, fallback, unsupported locales, dictionary consistency, and request isolation
+- [ ] 8.7 SEO foundation (BLUEPRINT.md §2.4)
+  - [ ] Translated Next.js titles/descriptions; locale-specific canonical and reciprocal hreflang URLs
+  - [ ] Public-page share metadata and configured absolute site URLs
+  - [ ] Sitemap and robots policy; login, dashboard, and shipment tracking noindex/exclusions
+  - [ ] Verify rendered HTML and metadata for both languages; no personal data in metadata
 - [ ] Recap quiz
 
 ## Step 9: Frontend features
@@ -124,6 +135,10 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] 9.3 Driver view: assigned shipments, status updates
 - [ ] 9.4 Dashboard: counts, deliveries/day, driver performance (+ `DashboardController`)
 - [ ] 9.5 Public tracking page (server-rendered, `noindex`)
+- [ ] 9.6 Apply Arabic/English translations and RTL/LTR to all frontend features
+  - [ ] Auth, shipments, drivers, dashboard, and tracking text and validation feedback
+  - [ ] Review forms/tables and mixed-language identifiers in both directions
+  - [ ] Verify localized metadata and noindex on tracking pages
 - [ ] Recap quiz
 
 ## Step 10: Hardening
@@ -132,6 +147,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] 10.3 Security audit pass (blueprint §8.2 table, row by row)
 - [ ] 10.4 API docs (Scribe)
 - [ ] 10.5 README (checklist in blueprint §12), screenshots
+- [ ] 10.6 Bilingual + SEO audit: rendered translations, locale URLs, canonical/hreflang, share metadata, sitemap/robots, noindex exclusions, semantic HTML, and performance
 - [ ] Recap quiz
 
 ## Step 11: Phase 2 (as time allows)
@@ -140,7 +156,8 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] 11.3 CSV bulk import
 - [ ] 11.4 CSV export
 - [ ] 11.5 Audit log viewer
-- [ ] 11.6 Arabic / English with RTL
+
+Arabic/English with RTL (formerly 11.6) is now part of MVP tasks 8.6, 9.6, and 10.6; SEO starts at 8.7. Implement these when their roadmap steps are reached.
 
 ## Step 12: Production deployment
 - [ ] 12.1 Write `DEPLOYMENT.md` (hosting choice, environments, cost)

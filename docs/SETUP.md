@@ -55,3 +55,25 @@ Repository settings are separate from local files: cloning the project does not
 copy GitHub settings, and local commits do not publish templates or activate
 Dependabot until pushed. Dependabot opens proposals; maintainers review and merge
 them, rather than automatically accepting updates.
+
+## Main branch and planning templates
+
+Work on a short-lived branch and open a pull request to `main`. The task 0.9
+protection requires the `File length check` job, an up-to-date branch, a PR,
+resolved review conversations, and linear history. Force pushes and branch
+deletion are disallowed; administrators follow the same requirements.
+
+The approval count is zero for this solo learning project: a PR is required, but
+the author is not blocked waiting for a second person's approval. Self-review and
+AI review still apply. Use squash merge to keep the history linear.
+
+The CI workflow currently exists locally and must be uploaded on a feature branch
+so GitHub can run the required check on the PR. A pending check is not a passing
+check. Do not disable protection to push directly to `main`.
+
+The issue templates cover reproducible bugs and features with acceptance criteria.
+Their configuration directs security reports to private advisories. Templates
+become available after reaching the default branch.
+
+`docs/adr/template.md` records context, alternatives, the decision, consequences,
+and verification. See `docs/adr/README.md` for naming and replacement rules.
