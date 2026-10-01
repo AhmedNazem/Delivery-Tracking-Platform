@@ -40,7 +40,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
   - [x] Counts code lines, ignores blank lines and supported comment forms (lexer limitations documented)
   - [x] Scans `app/`, `src/`, `routes/`, `tests/`; exemptions listed explicitly
   - [x] Fails with a clear message naming the file
-- [ ] 0.6 `.github/workflows/ci.yml` skeleton (runs the length check)
+- [~] 0.6 `.github/workflows/ci.yml` skeleton — developer approved and local commands passed; GitHub run pending after upload
 - [ ] 0.7 gitleaks pre-commit hook
 - [ ] 0.8 GitHub settings: secret scanning + push protection on (manual), `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml`
   - [ ] Enable private vulnerability reporting for the SECURITY.md reporting channel

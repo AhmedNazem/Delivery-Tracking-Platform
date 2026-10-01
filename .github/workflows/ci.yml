@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  file-length:
+    name: File length check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Check Bash syntax
+        run: bash -n scripts/check-file-length.sh tests/scripts/check-file-length-test.sh
+
+      - name: Test file length checker
+        run: bash tests/scripts/check-file-length-test.sh
+
+      - name: Enforce source file length limit
+        run: bash scripts/check-file-length.sh
