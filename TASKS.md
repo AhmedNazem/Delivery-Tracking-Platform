@@ -3,18 +3,19 @@
 Source of truth for progress. Steps match `BLUEPRINT.md` §11.
 Updated after every "next" gate (see §1.6 of the blueprint).
 
-**Legend:** `[ ]` todo · `[~]` in progress · `[x]` done (built, walked through, recruiter round passed, committed)
+**Legend:** `[ ]` todo · `[~]` in progress · `[x]` done (built, validated, applicable learning gate passed, committed)
 
-**Per-file cycle** (applies to every file task below): preview → build → walkthrough → developer review → recruiter round → "next" → commit.
+**Coding cycle:** preview → build → walkthrough → developer review → recruiter round → "next" → commit.
+**Setup/documentation cycle:** preview → build → short summary + validation → "next" → commit. No separate learning guide or interview exercises (blueprint §1.6).
 **Per-step close:** recap quiz covering the whole step.
-**Active review:** every task follows `BLUEPRINT.md` §1.7: file inventory, flow, design tradeoffs, good/bad examples, an unanswered review exercise, and hands-on practice.
+**Active review:** coding tasks follow `BLUEPRINT.md` §1.7: file inventory, flow, design tradeoffs, good/bad examples, an unanswered review exercise, and hands-on practice.
 **Definition of done** (blueprint §14.5): tests first and green · CI green · no file over 150 lines · walkthrough and recruiter round passed · docs updated · this file ticked.
 
 ## Progress
 
 | Step | Name | Status |
 |---|---|---|
-| 0 | Repo setup | 2 / 10 |
+| 0 | Repo setup | 3 / 10 |
 | 1 | Backend skeleton | 0 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
@@ -33,7 +34,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 ## Step 0: Repo setup
 - [x] 0.1 Rename blueprint to `BLUEPRINT.md`, add this tracker, commit
 - [x] 0.2 `.gitignore` — verification, learning review, recruiter round, and "next" gate passed
-- [ ] 0.3 `LICENSE` (MIT)
+- [x] 0.3 `LICENSE` (MIT) — validated; developer accepted setup exception and "next" gate
 - [ ] 0.4 `SECURITY.md`
 - [ ] 0.5 `scripts/check-file-length.sh`
   - [ ] Counts code lines, ignores blank lines and comments
