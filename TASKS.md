@@ -15,7 +15,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 
 | Step | Name | Status |
 |---|---|---|
-| 0 | Repo setup | 6 / 10 |
+| 0 | Repo setup | 7 / 10 |
 | 1 | Backend skeleton | 0 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
@@ -48,7 +48,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
   - [x] Commit PR template and Dependabot config after developer review
   - [ ] Verify template availability and Dependabot activation after upload
 - [~] 0.9 Branch protection, issue templates, and ADR template — protection verified; developer said "next"; template activation after upload pending
-- [ ] 0.10 `CHANGELOG.md` + semver tagging convention
+- [x] 0.10 `CHANGELOG.md` + semver tagging convention — developer accepted and requested starting Laravel; no release tag created
 - [ ] Recap quiz
 
 ## Step 1: Backend skeleton
