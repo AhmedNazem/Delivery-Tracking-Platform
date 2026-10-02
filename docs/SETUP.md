@@ -183,3 +183,33 @@ Like a shop, Nginx receives the customer, Laravel handles the order, and MySQL
 keeps the records. `DB_HOST=mysql` uses the database service's name. Using
 `localhost` here would point back to the PHP container and fail to reach MySQL.
 Serving only `backend/public` keeps application files outside the web root.
+
+## PHP formatting (task 1.3)
+
+`backend/pint.json` selects the `psr12` preset required by the blueprint. Pint is
+already installed as a development dependency; no package or lock-file changes
+were needed. From the repository root:
+
+```bash
+docker compose exec app vendor/bin/pint
+docker compose exec app vendor/bin/pint --test
+```
+
+The first command fixes formatting. The second checks it without editing files
+and fails if formatting needs correction. For the portable Windows PHP runtime,
+run these from `backend/`:
+
+```powershell
+& ../.tools/php/php.exe vendor/bin/pint
+& ../.tools/php/php.exe vendor/bin/pint --test
+```
+
+Like a team using one document template, PSR-12 keeps everyone's PHP layout
+consistent. Pint checks layout, not whether shipment rules or permissions work.
+Behavior tests remain necessary. CI integration is task 1.5.
+
+Task inventory: one new file, `backend/pint.json`; six modified files: the User
+model, the users/cache/jobs migrations, this setup document, and the task tracker.
+The model now uses one trait per statement; the migrations use PSR-12 anonymous
+class formatting. Their database definitions and model behavior are unchanged.
+The migrations have not been run. Pint's check and both scaffold tests passed.
