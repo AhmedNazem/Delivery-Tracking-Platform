@@ -1,0 +1,321 @@
+# Local repository hooks
+
+Install Gitleaks from its [official project](https://github.com/gitleaks/gitleaks).
+Use a version that supports `gitleaks git --pre-commit --staged` (8.19 or newer).
+Ensure `gitleaks version` works in the shell used by Git. On this Windows checkout,
+a checksum-verified portable v8.24.3 is installed in `.tools/gitleaks/`; this local
+folder is ignored by Git and must not be committed. Other clones need their own
+installation. Version 8.24.3 is a pinned compatibility baseline, not a claim that
+it is the newest release.
+
+From the repository root, activate the tracked hook:
+
+```bash
+git config --local core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+```
+
+Check for an existing hooksPath or custom pre-commit hook before activating this
+directory; switching hooksPath replaces which directory Git uses for all hooks.
+On Windows, Git Bash executes the hook. On Unix, the executable permission is
+required. A fresh clone does not automatically activate local hook configuration.
+If Windows also has WSL, run commits from Git Bash or ensure Git's `bin` and
+`usr/bin` directories precede Windows' WSL Bash launcher on PATH. Otherwise
+`env bash` can resolve to an unavailable WSL environment.
+
+The hook scans staged changes and blocks commits if Gitleaks finds potential
+secrets, cannot run, or reports an error. Diagnostics redact secret values.
+Inspect findings and correct the staged files; do not disable the scanner to
+force the commit through. A local hook is not a substitute for CI scanning or
+GitHub push protection, which are separate roadmap tasks.
+
+Run the hook behavior tests with:
+
+```bash
+bash tests/scripts/pre-commit-test.sh
+```
+
+These tests simulate scanner responses. Also verify the real scanner against a
+temporary repository with a clean staged file and a fake secret; do not use real
+credentials. Never infer complete security coverage from a successful scan.
+
+## GitHub repository security and dependency updates
+
+On 2026-10-02, the GitHub API confirmed this repository is public and has secret
+scanning and push protection enabled. Private vulnerability reporting was enabled
+and verified, so the private reporting channel described in SECURITY.md is active.
+
+The tracked PR template prompts reviewers for the problem, validation, and risks.
+Dependabot currently checks GitHub Actions weekly and limits open update PRs to
+five. It becomes active after `.github/dependabot.yml` reaches the default branch.
+Add Composer for `/backend` and npm for `/frontend` when their package manifests
+exist; do not configure update jobs for nonexistent manifests.
+
+Repository settings are separate from local files: cloning the project does not
+copy GitHub settings, and local commits do not publish templates or activate
+Dependabot until pushed. Dependabot opens proposals; maintainers review and merge
+them, rather than automatically accepting updates.
+
+## Main branch and planning templates
+
+Work on a short-lived branch and open a pull request to `main`. The task 0.9
+protection requires the `File length check` job, an up-to-date branch, a PR,
+resolved review conversations, and linear history. Force pushes and branch
+deletion are disallowed; administrators follow the same requirements.
+
+The approval count is zero for this solo learning project: a PR is required, but
+the author is not blocked waiting for a second person's approval. Self-review and
+AI review still apply. Use squash merge to keep the history linear.
+
+The CI workflow currently exists locally and must be uploaded on a feature branch
+so GitHub can run the required check on the PR. A pending check is not a passing
+check. Do not disable protection to push directly to `main`.
+
+The issue templates cover reproducible bugs and features with acceptance criteria.
+Their configuration directs security reports to private advisories. Templates
+become available after reaching the default branch.
+
+`docs/adr/template.md` records context, alternatives, the decision, consequences,
+and verification. See `docs/adr/README.md` for naming and replacement rules.
+
+## Laravel backend (task 1.1)
+
+The backend uses Laravel 12, with PHP 8.3.35 and Composer 2.10.3 installed locally
+in the ignored `.tools` folder. Other clones must install PHP 8.3 and Composer or
+use the Docker environment introduced in task 1.2. Tool archives were verified
+against their publishers' checksums before execution.
+
+From the repository root in PowerShell on this checkout:
+
+```powershell
+& .tools/php/php.exe backend/artisan --version
+& .tools/php/php.exe backend/artisan route:list
+& .tools/php/php.exe backend/artisan serve --host=127.0.0.1 --port=8000
+```
+
+For tests, run from `backend` so Laravel's test runner resolves PHPUnit correctly:
+
+```powershell
+Push-Location backend
+& ../.tools/php/php.exe artisan test
+Pop-Location
+```
+
+Composer installs should run with the portable PHP directory on the current
+process PATH. Its subprocesses invoke `php` themselves. This does not require
+changing the machine's global PATH:
+
+```powershell
+$env:PATH = (Join-Path (Get-Location) '.tools/php') + ';' + $env:PATH
+$env:COMPOSER_IPRESOLVE = '4'
+& .tools/php/php.exe .tools/composer/composer.phar --working-dir=backend install
+```
+
+On this checkout, the ignored `backend/.env` has a generated application key and
+uses file sessions, file cache, and synchronous queues to boot without a database.
+The committed `.env.example` remains the standard scaffold example, with no real
+secrets. Its full project configuration is task 1.5. Default migration files are
+present but have not been run; MySQL setup is task 1.2 and schema work is step 3.
+
+The welcome page is a minimal boot check, not the Next.js product interface.
+No auth or shipment endpoints have been implemented. API/Sanctum setup comes
+later; `/up` is the framework's basic liveness endpoint, not a database readiness
+check. Laravel's default unit test only checks `true`; meaningful behavior tests
+will accompany actual features.
+
+## Docker backend environment (task 1.2)
+
+Five tracked files define this environment: `docker-compose.yml` coordinates the
+services, `docker/php/Dockerfile` builds PHP with Laravel's needed extensions,
+`docker/nginx/default.conf` forwards requests to PHP-FPM, `.dockerignore` excludes
+unneeded build context, and the root `.env.example` documents Docker variables.
+
+On a new checkout, copy root `.env.example` to root `.env` and replace its demo
+passwords. Also copy `backend/.env.example` to `backend/.env`. These are two
+different files: Compose reads the root file; Laravel reads the backend file.
+This checkout already has both ignored files and generated local credentials.
+
+Start Docker Desktop with Linux containers, then from the repository root:
+
+```bash
+docker compose config --quiet
+docker compose up --build -d
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan test
+docker compose exec nginx nginx -t
+docker compose exec app php artisan tinker --execute="dump(DB::select('SELECT 1 AS healthy'));"
+```
+
+Generate the Laravel key only on initial setup when APP_KEY is empty; the current
+checkout already has one. Open `http://localhost:8000` after PHP finishes its
+Composer install. MySQL is internal to the Compose network, not exposed to the
+host. PHP uses the regular application database user, not the MySQL root user.
+
+The app waits for an authenticated MySQL health check. The first database startup
+has a three-minute grace period before failed checks count toward its retry limit.
+Nginx waits for the app
+container to start, but PHP still needs time to finish Composer before accepting
+requests; a brief initial 502 is possible. Check `docker compose logs app` if it
+persists. On Windows, Composer autoload generation through the bind mount can take
+several minutes on the first start. Sessions and cache use files until the database
+roadmap is implemented.
+
+Run migrations only when the relevant database tasks have been reviewed; startup
+does not run migrations, seeders, or generate/rotate application keys implicitly.
+
+`docker compose down` stops this stack and preserves the named MySQL data volume.
+Do not add `--volumes` unless you explicitly intend to delete its local database.
+Rebuilding containers does not reset database passwords stored in an existing
+volume; change them through MySQL or deliberately recreate disposable data.
+
+This setup is for local development: source code is bind-mounted, Composer runs
+on startup, and APP_DEBUG follows the local Laravel file. Production images,
+permissions, TLS, queues, and deployment controls are separate roadmap work.
+The frontend service is added when a Next.js project exists in step 8.
+
+Validation on this checkout: the Docker build and Nginx configuration check passed,
+both scaffold tests passed inside the PHP container, and Laravel queried MySQL
+successfully with `SELECT 1 AS healthy`. The welcome page returned HTTP 200;
+Nginx returned 403 for `/.env` and 404 for `/other.php`.
+
+Simple request flow: browser -> Nginx -> PHP/Laravel -> MySQL -> response.
+Like a shop, Nginx receives the customer, Laravel handles the order, and MySQL
+keeps the records. `DB_HOST=mysql` uses the database service's name. Using
+`localhost` here would point back to the PHP container and fail to reach MySQL.
+Serving only `backend/public` keeps application files outside the web root.
+
+## PHP formatting (task 1.3)
+
+`backend/pint.json` selects the `psr12` preset required by the blueprint. Pint is
+already installed as a development dependency; no package or lock-file changes
+were needed. From the repository root:
+
+```bash
+docker compose exec app vendor/bin/pint
+docker compose exec app vendor/bin/pint --test
+```
+
+The first command fixes formatting. The second checks it without editing files
+and fails if formatting needs correction. For the portable Windows PHP runtime,
+run these from `backend/`:
+
+```powershell
+& ../.tools/php/php.exe vendor/bin/pint
+& ../.tools/php/php.exe vendor/bin/pint --test
+```
+
+Like a team using one document template, PSR-12 keeps everyone's PHP layout
+consistent. Pint checks layout, not whether shipment rules or permissions work.
+Behavior tests remain necessary. CI integration is task 1.5.
+
+Task inventory: one new file, `backend/pint.json`; six modified files: the User
+model, the users/cache/jobs migrations, this setup document, and the task tracker.
+The model now uses one trait per statement; the migrations use PSR-12 anonymous
+class formatting. Their database definitions and model behavior are unchanged.
+The migrations have not been run. Pint's check and both scaffold tests passed.
+
+## PHP code analysis (task 1.4)
+
+Larastan is a development dependency that helps PHPStan understand Laravel's
+models, facades, and other framework features. `backend/phpstan.neon` includes
+Larastan and Carbon's date-type extension, then sets the blueprint's level 8.
+It checks `app`, application bootstrap, factories, seeders, routes, and tests.
+Generated files, dependencies, and configuration files are outside these paths.
+Its cache is stored in ignored `storage/framework/cache/phpstan`.
+
+From the repository root with Docker running:
+
+```bash
+docker compose exec app vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+```
+
+Or from `backend/` using the portable Windows PHP runtime:
+
+```powershell
+& ../.tools/php/php.exe vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+```
+
+Real-world example: checking an order form before processing the order can catch
+a missing value. PHPStan similarly catches many type mistakes before a request
+hits them. It does not prove delivery rules, permissions, or database connections
+are correct; tests still check behavior. Larastan boots Laravel's container to
+understand framework types, but it does not run our HTTP test suite.
+
+The first run flagged the scaffold's `assertTrue(true)` unit test: it could never
+detect an application failure. That test was deleted rather than suppressing the
+warning. `tests/Unit/.gitkeep` preserves the directory for future real unit tests.
+The feature test still checks that the home page returns HTTP 200.
+
+File inventory: two new files (`phpstan.neon`, `tests/Unit/.gitkeep`); four modified
+files (`composer.json`, `composer.lock`, this document, and `TASKS.md`); one deleted
+file (`tests/Unit/ExampleTest.php`). Composer records Larastan and locks exact
+versions of it, PHPStan, and its SQL parser. No application logic changed.
+There are no baseline or ignore rules. CI integration remains task 1.5.
+
+## Example environment and backend CI (task 1.5)
+
+`backend/.env.example` now uses the application name, port 8000, MySQL service
+name and regular application user from Compose. Its database password is a demo
+value. Compose overrides that value using the ignored root `.env` password.
+For PHP commands run outside Docker, `mysql` is not a host-accessible address;
+use the Docker commands when a command needs the database. Existing local `.env`
+files are not overwritten by this task. APP_KEY stays empty in the example and
+must be generated once for each new environment.
+
+File sessions, file cache, and synchronous queues allow startup before the
+database migrations and worker tasks. Email is logged locally, cloud credentials
+are blank, and APP_DEBUG=true is intended only for local development. Arabic and
+English frontend translations remain step 8; APP_LOCALE=en is the backend default.
+
+The workflow's `Backend quality checks` job uses PHP 8.3, validates Composer,
+installs dependencies from the lock file, generates a disposable application key,
+checks Pint formatting, runs PHPStan level 8, and runs the backend tests. It uses
+SQLite in memory with array sessions/cache and synchronous queues. No production
+credentials, MySQL service, migrations, or frontend build are needed for the
+current smoke test. Future database behavior needs meaningful database tests.
+
+Like inspecting a parcel before sending it, CI checks each proposed change before
+it is accepted. Pint checks presentation, PHPStan checks potential code errors,
+and tests check behavior. The workflow uses `pint --test` so formatting problems
+fail the check rather than being silently repaired on a temporary runner.
+
+Task inventory: no new files; four modified files: `backend/.env.example`,
+`.github/workflows/ci.yml`, this document, and `TASKS.md`. The PHP setup action is
+pinned to a verified commit. Workflow execution on GitHub is pending upload;
+local verification is not a GitHub run. Branch protection currently requires
+`File length check`; adding the backend check to required checks is a separate
+repository-settings change after its first successful GitHub run.
+
+Local validation used an isolated copy under ignored `.tools/ci-validation`,
+copied the example environment, installed all 114 locked packages from the local
+Composer cache, and generated a temporary key. Composer validation, Pint,
+PHPStan level 8, and the feature test passed. The workflow YAML parsed with two
+jobs and nine backend steps. This validates the backend commands on Windows;
+the Ubuntu runner and action execution still need their first GitHub run.
+
+## Sanctum browser authentication foundation (task 2.2)
+
+Sanctum is installed for the planned Next.js frontend at http://localhost:3000.
+The backend remains http://localhost:8000. The committed backend example adds
+CORS_ALLOWED_ORIGINS (full origins), SANCTUM_STATEFUL_DOMAINS (hosts with ports),
+and local cookie settings. Existing ignored environment files are preserved;
+the configuration defaults support the localhost development addresses.
+
+Use localhost consistently on both sides. Frontend requests must include
+credentials. First request GET /sanctum/csrf-cookie; it returns HTTP 204 with
+session and XSRF-TOKEN cookies. Later state-changing requests must include the
+URL-decoded XSRF-TOKEN cookie value in X-XSRF-TOKEN. Login endpoints arrive in
+task 2.3; enabling stateful middleware alone does not protect every API route.
+
+Production needs explicit frontend origins/stateful hosts, HTTPS with secure
+cookies, and an appropriate session domain for the planned shared parent domain.
+After changing environment settings, clear Laravel's cached configuration using
+`docker compose exec app php artisan config:clear` and rebuild production config
+as part of deployment. No migration or personal-access-token feature is included.
+
+The five feature tests cover cookie creation, allowed preflight, unknown origins,
+missing CSRF tokens, and matching tokens. They activate the real CSRF branch
+because Laravel normally bypasses it during tests. Full browser authentication
+and credential handling require the later frontend and login tasks.
+See [the task's learning guide](learning/2.2-sanctum-spa.md) for the file inventory,
+request flow, line-by-line explanation, and review exercises.

@@ -2,7 +2,9 @@
 
 A logistics and delivery management platform: dispatchers create and assign shipments, drivers update delivery status from the field, customers track parcels by tracking number.
 
-**Stack:** Laravel 11 (PHP 8.3) · MySQL 8 · React 18 + Vite + TypeScript · Laravel Sanctum · Docker Compose · GitHub Actions
+**Stack:** Laravel 12 (PHP 8.3) · MySQL 8 · Next.js (App Router) + React + TypeScript · i18next + react-i18next · Laravel Sanctum · Docker Compose · GitHub Actions
+
+**Backend version decision (2026-10-02):** Laravel 12 replaces Laravel 11 with the developer's approval. Keep PHP 8.3 and the existing architecture and learning roadmap. Task 1.1 must install the Laravel 12 major version explicitly.
 
 **Repository:** public. Everything in this document assumes that anyone can read the code and the git history.
 
@@ -49,20 +51,39 @@ These apply to every file from the first commit.
 
 This project exists to be explained in a job interview, so **no step is complete until the developer can explain it.** Claude acts as tutor and mock interviewer, in the chat, for every file and feature.
 
-**For every file or feature built, in this order:**
+**Scope:** the full learning cycle below applies to executable code and its tests, including automation scripts. Routine repository setup, environment/ignore files, configuration, licenses, and Markdown documentation require a short purpose summary, file inventory, and relevant validation only; no separate learning guide, line-by-line review, exercise, or recruiter round. The developer still says "next" before the following task starts or the current task is committed. This exception also applies to the learning clauses in §14.5; code-related step recaps remain required.
+
+**For every code file or feature built, in this order:**
 1. **Preview:** before writing code, Claude states what will be built, why it exists, and where it sits in the request flow (§3).
 2. **Build small:** one file or one tightly related group at a time, never a batch of unrelated files.
 3. **Walkthrough:** after writing, Claude explains the file line by line in plain language, covering the Laravel concept used and the design reason (which SOLID principle, which blueprint rule).
 4. **Developer review:** the developer reads the code and says what they do not understand. Claude re-explains until it is clear. Claude does not move on while questions are open.
 5. **Recruiter round:** Claude plays a recruiter and asks 2 to 4 interview-style questions about that file (what it does, why it was designed this way, what breaks if changed, how to test it). The developer answers in their own words; Claude gives feedback and corrects gaps.
-6. **Gate:** the developer explicitly says "next" before Claude starts the following step. Nothing is committed until this gate passes.
+6. **Gate:** offer review after completing the small task. The developer may explicitly say "next" or ask to move on even with unanswered practice questions; respect that instruction, record remaining practice honestly, and proceed or commit. Never repeatedly block an explicit request to continue with more quiz questions.
 
 **Rules:**
 - Claude never silently adds code the developer has not been walked through.
 - If the developer cannot answer a recruiter question, that file is revisited before continuing.
 - Each roadmap step (§11) ends with a short recap quiz covering the whole step.
 - The developer may ask "why" at any time; explaining takes priority over speed.
+- Database work is explained too: for every migration and query, Claude shows the SQL it produces, why each index exists, and how to check it with `EXPLAIN`.
 - `Laravel-Crash-Course.md` (desktop) is the reference for concepts; Claude links back to its sections when relevant.
+
+### 1.7 Active code review practice (required for coding tasks)
+
+The goal is independent reasoning: the developer must be able to read unfamiliar code, trace behavior, identify edge cases, and justify a fix without relying on the assistant to supply the answer.
+
+- **Explanation style:** write learning guides, code walkthroughs, and interview practice in English, as requested by the developer. Use the simplest possible language and concrete real-world examples. Introduce unfamiliar syntax before relying on it, and explain one small piece at a time.
+
+- **File inventory:** report the exact number of new and modified files separately, with clickable paths, a one-sentence purpose for each, and a suggested reading order. Count tests and learning documents too; distinguish executable code from documentation and configuration.
+- **Learning artifact:** maintain `docs/learning/<task-id>-<topic>.md` for each coding task. Include the inventory, actual implementation excerpts, line-by-line explanation, flow between files, validation results, and known limitations. Keep code examples small and tied to the current task.
+- **Design reasoning:** explain why this implementation was chosen, the alternatives and tradeoffs, and the relevant Laravel concept and blueprint rule. Apply SOLID only where it genuinely applies.
+- **Good and bad examples:** show a working approach beside a flawed alternative. Explain the concrete failure, its trigger, and the smallest correction. Label intentionally flawed examples as teaching-only; never add them to application code. For legal documents, preserve standard wording and use configuration or workflow examples instead of rewriting legal terms.
+- **Independent review first:** include a separate, unannotated teaching snippet or diff with a deliberate defect. Ask the developer to predict behavior, trace inputs and outputs, identify edge cases, and suggest a fix or test before revealing the solution. Keep its answer out of the initial artifact; provide hints and feedback after the developer attempts it.
+- **Interview practice:** the 2–4 recruiter questions must include reasoning about the actual code or configuration, a failure case, and how to verify behavior. Recall of terminology alone does not pass the review.
+- **Small hands-on exercise:** ask the developer to make or propose one focused change and explain the expected result. Do not silently do their exercise for them.
+- **Setup tasks:** provide a short purpose summary, file inventory, and relevant checks only, as specified in §1.6. Do not create learning guides or interview exercises for these tasks. Automation scripts are code and retain the full learning cycle.
+- **Review after implementation:** finish implementation and validation, then provide a simple review with good practices. Keep unanswered exercises available for later. An explicit developer instruction to continue overrides the practice gate; record the override without claiming the questions were answered or mastery was demonstrated. Do not retroactively reopen tasks already accepted.
 
 ---
 
@@ -98,16 +119,38 @@ This project exists to be explained in a job interview, so **no step is complete
 **Dashboard**
 - Counts by status, deliveries per day (last 30 days), driver performance (delivered / failed ratio).
 
+**Bilingual interface and SEO**
+- Arabic and English are MVP requirements, built during frontend foundation and feature work (§2.4), rather than postponed to Phase 2.
+
 ### 2.2 Phase 2 (after MVP is solid)
 - Proof of delivery (photo upload + recipient signature name).
 - Email/SMS notification on status change via a pluggable `NotificationChannel`.
 - Bulk import of shipments from CSV.
 - Export reports to CSV.
 - Audit log viewer for admins.
-- Arabic / English UI with RTL support.
 
 ### 2.3 Explicitly out of scope
 Real-time GPS, payments, route optimization, mobile apps. Mention them in the README as future work only.
+
+### 2.4 Arabic / English and SEO (frontend roadmap)
+
+**Translation choice:** use `i18next` with `react-i18next` for the Next.js interface. Do not substitute `next-intl` without the developer requesting a change. Implement this when frontend work begins; recording this requirement does not authorize skipping prerequisite roadmap tasks.
+
+- Support `ar` and `en` through explicit locale routes such as `/ar` and `/en`. Validate locale values and define a documented default/fallback during task 8.6.
+- Keep translated UI text in matching locale dictionaries, organized by feature or namespace. Avoid hardcoded visible text and language conditionals scattered through components.
+- Load the chosen language on the server so the initial HTML already contains translated content. Keep server i18next instances isolated per request to prevent concurrent users receiving each other's language; hydrate client components consistently.
+- Set HTML `lang` and `dir` from the locale: Arabic uses `rtl`, English uses `ltr`. Use CSS logical properties and verify forms, tables, icons, and mixed-language tracking numbers in both directions.
+- Provide a language switcher that preserves the equivalent page when available, and use locale-aware formatting for dates, numbers, and money.
+- Begin with one small translated page and switcher during task 8.6, with the usual code walkthrough and review, before applying the pattern to all features in task 9.6.
+- This frontend requirement does not silently add backend localization packages. Decide Laravel validation/API message localization separately when those features are built.
+
+**SEO from the frontend foundation:**
+- Use Next.js metadata with translated titles and descriptions; eligible public pages have locale-specific canonical URLs and reciprocal `hreflang` alternates (`ar`/`en`). Generate absolute URLs from the configured public site origin, not a hardcoded production hostname.
+- Add localized Open Graph metadata and suitable share metadata for eligible public pages. Use semantic HTML, meaningful headings, and translated image alternatives where applicable.
+- Maintain `sitemap.xml` and `robots.txt` when public routes exist. Include only canonical, indexable public URLs in the sitemap; exclude login, authenticated dashboard, and shipment tracking pages/results.
+- Preserve `noindex` for public shipment tracking pages, including localized metadata. Mark login and authenticated dashboard pages `noindex` too. These directives are not access control; policies and authentication still protect private data.
+- Do not rely on robots.txt blocking to make crawlers read a page's `noindex`. Keep personal shipment data out of public metadata, share previews, and structured data.
+- Test server-rendered translations, language switching, RTL/LTR, dictionary consistency, fallback/unsupported locales, metadata and alternate URLs, and the noindex/sitemap exclusions. Verify representative page HTML and complete an SEO audit during hardening.
 
 ---
 
@@ -212,7 +255,8 @@ backend/
 Feature-based structure; each feature owns its components, hooks, and API calls.
 ```
 frontend/src/
-├── app/                 # providers, router, app shell
+├── i18n/                # i18next server/client setup, locale validation, dictionaries
+├── app/                 # Next.js App Router: routes, layouts, providers
 ├── features/
 │   ├── auth/            # LoginForm, useAuth, authApi
 │   ├── shipments/       # ShipmentTable, ShipmentForm, useShipments, shipmentsApi
@@ -220,10 +264,9 @@ frontend/src/
 │   ├── dashboard/
 │   └── tracking/        # public tracking page
 ├── components/ui/       # Button, Input, Modal, Table, StatusBadge
-├── lib/                 # axios client, formatters
+├── lib/                 # API client, formatters
 ├── hooks/               # shared hooks
-├── types/               # shared TypeScript types
-└── main.tsx
+└── types/               # shared TypeScript types
 ```
 
 ### 4.3 Repository root
@@ -379,9 +422,9 @@ At least one feature test per row of the access-control matrix: each role attemp
 ---
 
 ## 10. CI/CD & DevOps
-- `docker-compose.yml`: `app` (PHP-FPM), `nginx`, `mysql`, `frontend` (Vite dev). One command to run locally: `docker compose up`.
+- `docker-compose.yml`: `app` (PHP-FPM), `nginx`, `mysql`, `frontend` (Next.js dev). One command to run locally: `docker compose up`.
 - GitHub Actions `ci.yml`: install → lint → static analysis → tests (with MySQL service) → file-length check → frontend build.
-- Optional deployment later: backend on Render/Railway/DigitalOcean, frontend on Vercel; secrets only via the platform's environment settings.
+- Continuous delivery pipeline and environments: see §14. Hosting candidates: backend on Render/Railway/DigitalOcean, frontend on Vercel; secrets only via the platform's environment settings.
 
 ---
 
@@ -397,10 +440,11 @@ At least one feature test per row of the access-control matrix: each role attemp
 | 5 | State machine & events | Transitions, event log, 409 on invalid transitions, tests |
 | 6 | Drivers & assignment | Assign/reassign, driver-scoped endpoint, access tests |
 | 7 | Public tracking | Safe resource, rate limiting, tests |
-| 8 | Frontend foundation | Vite + TS, auth flow, route guards, API client |
-| 9 | Frontend features | Shipment table/form, driver view, dashboard, tracking page |
-| 10 | Hardening | Security headers, CORS, audit pass, README with screenshots, API docs |
+| 8 | Frontend foundation | Next.js + TS, auth flow (Sanctum cookies), route guards, API client, i18next + locale routing, SEO foundation |
+| 9 | Frontend features | Shipment table/form, driver view, dashboard, tracking page, Arabic/English across features |
+| 10 | Hardening | Security headers, CORS, audit pass, README with screenshots, API docs, bilingual and SEO audit |
 | 11 | Phase 2 items | As time allows |
+| 12 | Production deployment | `DEPLOYMENT.md` written and followed: hosting and environments, production `.env` and secrets, HTTPS, app/API on one parent domain for Sanctum cookies, safe migrations, queue worker and scheduler, backups, logging/monitoring, rollback |
 
 Realistic timeline: steps 0–7 (working API) in about one week; 8–10 (dashboard and polish) in the second week.
 
@@ -426,3 +470,48 @@ Be ready to explain, in your own words and with the code open:
 - The Eloquent relationships (`Shipment belongsTo User` as driver, `hasMany ShipmentEvent`) and the indexes you chose and why.
 - How you would handle concurrency (two dispatchers assigning the same shipment): row locking or optimistic version check.
 - What you would change to scale (queues for notifications, caching dashboard stats, read replicas).
+
+---
+
+## 14. Software Development Lifecycle
+
+Every feature goes through the same loop. Nothing skips a stage.
+
+| Stage | What happens here | Artifact |
+|---|---|---|
+| 1. Plan | Feature becomes a GitHub Issue with acceptance criteria; it maps to a task in `TASKS.md` | Issue + task |
+| 2. Design | Non-obvious decisions get a short ADR (why this, not that) | `docs/adr/NNNN-title.md` |
+| 3. Test first | Write a failing test for the behavior (red) | Test file |
+| 4. Implement | Smallest code to pass (green), then clean up (refactor commit) | Code |
+| 5. Local gate | Pint, PHPStan, ESLint, type-check, tests, 150-line check all pass locally | Clean run |
+| 6. Pull request | Short-lived branch, Conventional Commit title, PR template filled in | PR |
+| 7. CI | All checks must pass; branch protection blocks merge otherwise | Green build |
+| 8. Review | Self-review of the diff, plus AI code review; findings resolved | Approved PR |
+| 9. Merge | Squash-merge to `main`; `main` is always deployable | Commit on main |
+| 10. Release | Tag semver (`v0.1.0`), generate changelog | Git tag + `CHANGELOG.md` |
+| 11. Deploy | CD pipeline deploys to staging automatically, to production on manual approval | Live version |
+| 12. Operate | Monitoring, logs, backups, dependency updates (Dependabot) | Dashboards, alerts |
+| 13. Learn | Bugs get a regression test first, then a fix | Test + fix |
+
+### 14.1 Test pyramid
+- **Unit (many, fast, no database):** state machine, tracking number generator, DTOs, enums, Actions with a fake repository.
+- **Feature (some):** every endpoint through HTTP with `RefreshDatabase`, plus the 403 access matrix.
+- **End to end (few):** Playwright smoke test of the main flow, run against staging.
+- **Rules:** tests are written before the code they cover; a bug fix starts with a test that reproduces it; CI fails below 80% coverage on the application layer.
+
+### 14.2 CI (every push and PR)
+Parallel jobs: backend (Pint, PHPStan, tests with MySQL service, coverage gate), frontend (ESLint, type-check, Vitest, build), security (`composer audit`, `npm audit`, gitleaks), and the 150-line check.
+
+### 14.3 CD (on merge to `main`)
+1. Build Docker images, tag with the commit SHA.
+2. Deploy to **staging**, run migrations, run smoke tests.
+3. Manual approval gate, then deploy to **production** (GitHub Environments with required reviewer).
+4. Rollback = redeploy the previous image tag; migrations are written to be backward compatible for one release.
+
+### 14.4 Branching and repo controls
+- Branch protection on `main`: PR required, CI required, no force-push, linear history.
+- Branch names: `feat/...`, `fix/...`, `refactor/...`.
+- Environments: `local` (Docker), `staging`, `production`; each with its own secrets.
+
+### 14.5 Definition of done (every task)
+Tests written first and passing · all CI checks green · no file over 150 lines · walkthrough and recruiter round passed · docs updated (README, ADR, API docs if affected) · `TASKS.md` ticked.

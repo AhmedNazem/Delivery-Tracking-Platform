@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  file-length:
+    name: File length check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Check Bash syntax
+        run: bash -n scripts/check-file-length.sh tests/scripts/check-file-length-test.sh
+
+      - name: Test file length checker
+        run: bash tests/scripts/check-file-length-test.sh
+
+      - name: Enforce source file length limit
+        run: bash scripts/check-file-length.sh
+
+  backend:
+    name: Backend quality checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      SESSION_DRIVER: array
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+
+      - name: Prepare test environment
+        run: cp .env.example .env
+
+      - name: Validate Composer configuration
+        run: composer validate --strict --no-check-publish
+
+      - name: Install locked dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Generate temporary application key
+        run: php artisan key:generate --no-ansi
+
+      - name: Check PHP formatting
+        run: vendor/bin/pint --test
+
+      - name: Analyse PHP at level 8
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+
+      - name: Run backend tests
+        run: php artisan test --no-ansi
