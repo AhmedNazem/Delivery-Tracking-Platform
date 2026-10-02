@@ -251,3 +251,44 @@ files (`composer.json`, `composer.lock`, this document, and `TASKS.md`); one del
 file (`tests/Unit/ExampleTest.php`). Composer records Larastan and locks exact
 versions of it, PHPStan, and its SQL parser. No application logic changed.
 There are no baseline or ignore rules. CI integration remains task 1.5.
+
+## Example environment and backend CI (task 1.5)
+
+`backend/.env.example` now uses the application name, port 8000, MySQL service
+name and regular application user from Compose. Its database password is a demo
+value. Compose overrides that value using the ignored root `.env` password.
+For PHP commands run outside Docker, `mysql` is not a host-accessible address;
+use the Docker commands when a command needs the database. Existing local `.env`
+files are not overwritten by this task. APP_KEY stays empty in the example and
+must be generated once for each new environment.
+
+File sessions, file cache, and synchronous queues allow startup before the
+database migrations and worker tasks. Email is logged locally, cloud credentials
+are blank, and APP_DEBUG=true is intended only for local development. Arabic and
+English frontend translations remain step 8; APP_LOCALE=en is the backend default.
+
+The workflow's `Backend quality checks` job uses PHP 8.3, validates Composer,
+installs dependencies from the lock file, generates a disposable application key,
+checks Pint formatting, runs PHPStan level 8, and runs the backend tests. It uses
+SQLite in memory with array sessions/cache and synchronous queues. No production
+credentials, MySQL service, migrations, or frontend build are needed for the
+current smoke test. Future database behavior needs meaningful database tests.
+
+Like inspecting a parcel before sending it, CI checks each proposed change before
+it is accepted. Pint checks presentation, PHPStan checks potential code errors,
+and tests check behavior. The workflow uses `pint --test` so formatting problems
+fail the check rather than being silently repaired on a temporary runner.
+
+Task inventory: no new files; four modified files: `backend/.env.example`,
+`.github/workflows/ci.yml`, this document, and `TASKS.md`. The PHP setup action is
+pinned to a verified commit. Workflow execution on GitHub is pending upload;
+local verification is not a GitHub run. Branch protection currently requires
+`File length check`; adding the backend check to required checks is a separate
+repository-settings change after its first successful GitHub run.
+
+Local validation used an isolated copy under ignored `.tools/ci-validation`,
+copied the example environment, installed all 114 locked packages from the local
+Composer cache, and generated a temporary key. Composer validation, Pint,
+PHPStan level 8, and the feature test passed. The workflow YAML parsed with two
+jobs and nine backend steps. This validates the backend commands on Windows;
+the Ubuntu runner and action execution still need their first GitHub run.

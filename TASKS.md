@@ -56,7 +56,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [x] 1.2 `docker-compose.yml` + `docker/` (php-fpm, nginx, mysql) — stack running; Nginx, two Laravel tests, HTTP page, and real MySQL query passed; developer reviewed Docker ignore and said "continue"
 - [x] 1.3 Pint config (`pint.json`) and passing run — PSR-12 configured; four scaffold files formatted; Pint check and two Laravel tests passed; developer said "next"
 - [x] 1.4 PHPStan level 8 (`phpstan.neon`) and passing run — Larastan installed; level 8 passed without suppressed errors; removed always-passing scaffold test; developer reviewed Composer and requested the next task
-- [ ] 1.5 `.env.example` with dummy values; CI runs Pint + PHPStan
+- [~] 1.5 `.env.example` with dummy values; CI runs Pint + PHPStan — local isolated checks passed; developer accepted and requested continuing; first GitHub run pending upload
 - [ ] Recap quiz
 
 ## Step 2: Auth & roles
