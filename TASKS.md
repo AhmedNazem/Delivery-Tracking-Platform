@@ -16,7 +16,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 | Step | Name | Status |
 |---|---|---|
 | 0 | Repo setup | 7 / 10 |
-| 1 | Backend skeleton | 0 / 5 |
+| 1 | Backend skeleton | 1 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
 | 4 | Shipments CRUD | 0 / 8 |
@@ -52,7 +52,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] Recap quiz
 
 ## Step 1: Backend skeleton
-- [ ] 1.1 Install Laravel 11 in `backend/`
+- [x] 1.1 Install Laravel 12 (PHP 8.3) in `backend/` — tests and dependency checks passed; developer accepted and said "next"; remaining exercises available for later
 - [ ] 1.2 `docker-compose.yml` + `docker/` (php-fpm, nginx, mysql)
 - [ ] 1.3 Pint config (`pint.json`) and passing run
 - [ ] 1.4 PHPStan level 8 (`phpstan.neon`) and passing run

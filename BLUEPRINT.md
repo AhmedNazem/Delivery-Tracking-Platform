@@ -2,7 +2,9 @@
 
 A logistics and delivery management platform: dispatchers create and assign shipments, drivers update delivery status from the field, customers track parcels by tracking number.
 
-**Stack:** Laravel 11 (PHP 8.3) · MySQL 8 · Next.js (App Router) + React + TypeScript · i18next + react-i18next · Laravel Sanctum · Docker Compose · GitHub Actions
+**Stack:** Laravel 12 (PHP 8.3) · MySQL 8 · Next.js (App Router) + React + TypeScript · i18next + react-i18next · Laravel Sanctum · Docker Compose · GitHub Actions
+
+**Backend version decision (2026-10-02):** Laravel 12 replaces Laravel 11 with the developer's approval. Keep PHP 8.3 and the existing architecture and learning roadmap. Task 1.1 must install the Laravel 12 major version explicitly.
 
 **Repository:** public. Everything in this document assumes that anyone can read the code and the git history.
 
@@ -71,7 +73,7 @@ This project exists to be explained in a job interview, so **no step is complete
 
 The goal is independent reasoning: the developer must be able to read unfamiliar code, trace behavior, identify edge cases, and justify a fix without relying on the assistant to supply the answer.
 
-- **Explanation style:** use the simplest possible language and concrete real-world examples. Introduce unfamiliar syntax before relying on it, and explain one small piece at a time.
+- **Explanation style:** write learning guides, code walkthroughs, and interview practice in English, as requested by the developer. Use the simplest possible language and concrete real-world examples. Introduce unfamiliar syntax before relying on it, and explain one small piece at a time.
 
 - **File inventory:** report the exact number of new and modified files separately, with clickable paths, a one-sentence purpose for each, and a suggested reading order. Count tests and learning documents too; distinguish executable code from documentation and configuration.
 - **Learning artifact:** maintain `docs/learning/<task-id>-<topic>.md` for each coding task. Include the inventory, actual implementation excerpts, line-by-line explanation, flow between files, validation results, and known limitations. Keep code examples small and tied to the current task.

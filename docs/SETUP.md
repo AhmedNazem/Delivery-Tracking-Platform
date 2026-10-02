@@ -77,3 +77,48 @@ become available after reaching the default branch.
 
 `docs/adr/template.md` records context, alternatives, the decision, consequences,
 and verification. See `docs/adr/README.md` for naming and replacement rules.
+
+## Laravel backend (task 1.1)
+
+The backend uses Laravel 12, with PHP 8.3.35 and Composer 2.10.3 installed locally
+in the ignored `.tools` folder. Other clones must install PHP 8.3 and Composer or
+use the Docker environment introduced in task 1.2. Tool archives were verified
+against their publishers' checksums before execution.
+
+From the repository root in PowerShell on this checkout:
+
+```powershell
+& .tools/php/php.exe backend/artisan --version
+& .tools/php/php.exe backend/artisan route:list
+& .tools/php/php.exe backend/artisan serve --host=127.0.0.1 --port=8000
+```
+
+For tests, run from `backend` so Laravel's test runner resolves PHPUnit correctly:
+
+```powershell
+Push-Location backend
+& ../.tools/php/php.exe artisan test
+Pop-Location
+```
+
+Composer installs should run with the portable PHP directory on the current
+process PATH. Its subprocesses invoke `php` themselves. This does not require
+changing the machine's global PATH:
+
+```powershell
+$env:PATH = (Join-Path (Get-Location) '.tools/php') + ';' + $env:PATH
+$env:COMPOSER_IPRESOLVE = '4'
+& .tools/php/php.exe .tools/composer/composer.phar --working-dir=backend install
+```
+
+On this checkout, the ignored `backend/.env` has a generated application key and
+uses file sessions, file cache, and synchronous queues to boot without a database.
+The committed `.env.example` remains the standard scaffold example, with no real
+secrets. Its full project configuration is task 1.5. Default migration files are
+present but have not been run; MySQL setup is task 1.2 and schema work is step 3.
+
+The welcome page is a minimal boot check, not the Next.js product interface.
+No auth or shipment endpoints have been implemented. API/Sanctum setup comes
+later; `/up` is the framework's basic liveness endpoint, not a database readiness
+check. Laravel's default unit test only checks `true`; meaningful behavior tests
+will accompany actual features.
