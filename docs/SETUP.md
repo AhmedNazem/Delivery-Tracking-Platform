@@ -292,3 +292,30 @@ Composer cache, and generated a temporary key. Composer validation, Pint,
 PHPStan level 8, and the feature test passed. The workflow YAML parsed with two
 jobs and nine backend steps. This validates the backend commands on Windows;
 the Ubuntu runner and action execution still need their first GitHub run.
+
+## Sanctum browser authentication foundation (task 2.2)
+
+Sanctum is installed for the planned Next.js frontend at http://localhost:3000.
+The backend remains http://localhost:8000. The committed backend example adds
+CORS_ALLOWED_ORIGINS (full origins), SANCTUM_STATEFUL_DOMAINS (hosts with ports),
+and local cookie settings. Existing ignored environment files are preserved;
+the configuration defaults support the localhost development addresses.
+
+Use localhost consistently on both sides. Frontend requests must include
+credentials. First request GET /sanctum/csrf-cookie; it returns HTTP 204 with
+session and XSRF-TOKEN cookies. Later state-changing requests must include the
+URL-decoded XSRF-TOKEN cookie value in X-XSRF-TOKEN. Login endpoints arrive in
+task 2.3; enabling stateful middleware alone does not protect every API route.
+
+Production needs explicit frontend origins/stateful hosts, HTTPS with secure
+cookies, and an appropriate session domain for the planned shared parent domain.
+After changing environment settings, clear Laravel's cached configuration using
+`docker compose exec app php artisan config:clear` and rebuild production config
+as part of deployment. No migration or personal-access-token feature is included.
+
+The five feature tests cover cookie creation, allowed preflight, unknown origins,
+missing CSRF tokens, and matching tokens. They activate the real CSRF branch
+because Laravel normally bypasses it during tests. Full browser authentication
+and credential handling require the later frontend and login tasks.
+See [the task's learning guide](learning/2.2-sanctum-spa.md) for the file inventory,
+request flow, line-by-line explanation, and review exercises.
