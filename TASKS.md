@@ -17,7 +17,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 |---|---|---|
 | 0 | Repo setup | 7 / 10 |
 | 1 | Backend skeleton | 4 / 5 |
-| 2 | Auth & roles | 0 / 6 |
+| 2 | Auth & roles | 1 / 6 |
 | 3 | Database | 0 / 5 |
 | 4 | Shipments CRUD | 0 / 8 |
 | 5 | State machine & events | 0 / 5 |
@@ -60,7 +60,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [ ] Recap quiz
 
 ## Step 2: Auth & roles
-- [ ] 2.1 `UserRole` enum
+- [x] 2.1 `UserRole` enum — checks passed; English walkthrough and review practice added; developer said "next" with exercises deferred
 - [ ] 2.2 Sanctum SPA setup (CSRF cookie, stateful domains, CORS allow-list)
 - [ ] 2.3 `RegisterUser` action + `AuthController` (login, logout, me)
 - [ ] 2.4 Login throttling (per email + IP), generic error message
