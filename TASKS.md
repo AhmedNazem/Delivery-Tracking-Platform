@@ -16,7 +16,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 | Step | Name | Status |
 |---|---|---|
 | 0 | Repo setup | 7 / 10 |
-| 1 | Backend skeleton | 3 / 5 |
+| 1 | Backend skeleton | 4 / 5 |
 | 2 | Auth & roles | 0 / 6 |
 | 3 | Database | 0 / 5 |
 | 4 | Shipments CRUD | 0 / 8 |
@@ -55,7 +55,7 @@ Updated after every "next" gate (see §1.6 of the blueprint).
 - [x] 1.1 Install Laravel 12 (PHP 8.3) in `backend/` — tests and dependency checks passed; developer accepted and said "next"; remaining exercises available for later
 - [x] 1.2 `docker-compose.yml` + `docker/` (php-fpm, nginx, mysql) — stack running; Nginx, two Laravel tests, HTTP page, and real MySQL query passed; developer reviewed Docker ignore and said "continue"
 - [x] 1.3 Pint config (`pint.json`) and passing run — PSR-12 configured; four scaffold files formatted; Pint check and two Laravel tests passed; developer said "next"
-- [ ] 1.4 PHPStan level 8 (`phpstan.neon`) and passing run
+- [x] 1.4 PHPStan level 8 (`phpstan.neon`) and passing run — Larastan installed; level 8 passed without suppressed errors; removed always-passing scaffold test; developer reviewed Composer and requested the next task
 - [ ] 1.5 `.env.example` with dummy values; CI runs Pint + PHPStan
 - [ ] Recap quiz
 

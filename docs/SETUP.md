@@ -213,3 +213,41 @@ model, the users/cache/jobs migrations, this setup document, and the task tracke
 The model now uses one trait per statement; the migrations use PSR-12 anonymous
 class formatting. Their database definitions and model behavior are unchanged.
 The migrations have not been run. Pint's check and both scaffold tests passed.
+
+## PHP code analysis (task 1.4)
+
+Larastan is a development dependency that helps PHPStan understand Laravel's
+models, facades, and other framework features. `backend/phpstan.neon` includes
+Larastan and Carbon's date-type extension, then sets the blueprint's level 8.
+It checks `app`, application bootstrap, factories, seeders, routes, and tests.
+Generated files, dependencies, and configuration files are outside these paths.
+Its cache is stored in ignored `storage/framework/cache/phpstan`.
+
+From the repository root with Docker running:
+
+```bash
+docker compose exec app vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+```
+
+Or from `backend/` using the portable Windows PHP runtime:
+
+```powershell
+& ../.tools/php/php.exe vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+```
+
+Real-world example: checking an order form before processing the order can catch
+a missing value. PHPStan similarly catches many type mistakes before a request
+hits them. It does not prove delivery rules, permissions, or database connections
+are correct; tests still check behavior. Larastan boots Laravel's container to
+understand framework types, but it does not run our HTTP test suite.
+
+The first run flagged the scaffold's `assertTrue(true)` unit test: it could never
+detect an application failure. That test was deleted rather than suppressing the
+warning. `tests/Unit/.gitkeep` preserves the directory for future real unit tests.
+The feature test still checks that the home page returns HTTP 200.
+
+File inventory: two new files (`phpstan.neon`, `tests/Unit/.gitkeep`); four modified
+files (`composer.json`, `composer.lock`, this document, and `TASKS.md`); one deleted
+file (`tests/Unit/ExampleTest.php`). Composer records Larastan and locks exact
+versions of it, PHPStan, and its SQL parser. No application logic changed.
+There are no baseline or ignore rules. CI integration remains task 1.5.
