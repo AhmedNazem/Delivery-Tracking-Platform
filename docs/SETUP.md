@@ -122,3 +122,64 @@ No auth or shipment endpoints have been implemented. API/Sanctum setup comes
 later; `/up` is the framework's basic liveness endpoint, not a database readiness
 check. Laravel's default unit test only checks `true`; meaningful behavior tests
 will accompany actual features.
+
+## Docker backend environment (task 1.2)
+
+Five tracked files define this environment: `docker-compose.yml` coordinates the
+services, `docker/php/Dockerfile` builds PHP with Laravel's needed extensions,
+`docker/nginx/default.conf` forwards requests to PHP-FPM, `.dockerignore` excludes
+unneeded build context, and the root `.env.example` documents Docker variables.
+
+On a new checkout, copy root `.env.example` to root `.env` and replace its demo
+passwords. Also copy `backend/.env.example` to `backend/.env`. These are two
+different files: Compose reads the root file; Laravel reads the backend file.
+This checkout already has both ignored files and generated local credentials.
+
+Start Docker Desktop with Linux containers, then from the repository root:
+
+```bash
+docker compose config --quiet
+docker compose up --build -d
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan test
+docker compose exec nginx nginx -t
+docker compose exec app php artisan tinker --execute="dump(DB::select('SELECT 1 AS healthy'));"
+```
+
+Generate the Laravel key only on initial setup when APP_KEY is empty; the current
+checkout already has one. Open `http://localhost:8000` after PHP finishes its
+Composer install. MySQL is internal to the Compose network, not exposed to the
+host. PHP uses the regular application database user, not the MySQL root user.
+
+The app waits for an authenticated MySQL health check. The first database startup
+has a three-minute grace period before failed checks count toward its retry limit.
+Nginx waits for the app
+container to start, but PHP still needs time to finish Composer before accepting
+requests; a brief initial 502 is possible. Check `docker compose logs app` if it
+persists. On Windows, Composer autoload generation through the bind mount can take
+several minutes on the first start. Sessions and cache use files until the database
+roadmap is implemented.
+
+Run migrations only when the relevant database tasks have been reviewed; startup
+does not run migrations, seeders, or generate/rotate application keys implicitly.
+
+`docker compose down` stops this stack and preserves the named MySQL data volume.
+Do not add `--volumes` unless you explicitly intend to delete its local database.
+Rebuilding containers does not reset database passwords stored in an existing
+volume; change them through MySQL or deliberately recreate disposable data.
+
+This setup is for local development: source code is bind-mounted, Composer runs
+on startup, and APP_DEBUG follows the local Laravel file. Production images,
+permissions, TLS, queues, and deployment controls are separate roadmap work.
+The frontend service is added when a Next.js project exists in step 8.
+
+Validation on this checkout: the Docker build and Nginx configuration check passed,
+both scaffold tests passed inside the PHP container, and Laravel queried MySQL
+successfully with `SELECT 1 AS healthy`. The welcome page returned HTTP 200;
+Nginx returned 403 for `/.env` and 404 for `/other.php`.
+
+Simple request flow: browser -> Nginx -> PHP/Laravel -> MySQL -> response.
+Like a shop, Nginx receives the customer, Laravel handles the order, and MySQL
+keeps the records. `DB_HOST=mysql` uses the database service's name. Using
+`localhost` here would point back to the PHP container and fail to reach MySQL.
+Serving only `backend/public` keeps application files outside the web root.
